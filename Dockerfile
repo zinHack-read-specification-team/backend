@@ -24,4 +24,6 @@ COPY --from=builder /app/bin/application ./
 
 ENV APP_ENV=prod
 
+EXPOSE 8080
+
 CMD ["./application"]
