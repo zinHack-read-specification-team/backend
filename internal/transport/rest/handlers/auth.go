@@ -93,6 +93,7 @@ func (h *AuthHandler) SignInUser(c echo.Context) error {
 	}
 
 	log.Println("User signed in successfully")
+	c.Response().Header().Set(echo.HeaderAuthorization, "Bearer "+token)
 
 	return c.JSON(http.StatusOK, res.SignInRes{
 		Token:   token,
