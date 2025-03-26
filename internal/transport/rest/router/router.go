@@ -2,6 +2,7 @@ package router
 
 import (
 	"backend/internal/repository"
+	rmiddleware "backend/internal/transport/rest/Rmiddleware"
 	"backend/internal/transport/rest/handlers"
 	"backend/internal/transport/service"
 	"backend/pkg/cache"
@@ -24,10 +25,13 @@ func SetupRouter(e *echo.Echo, cfg *config.Config, log *logger.Logger, db *db.Da
 	ddbb := db.DB
 
 	authRepo := repository.NewAuthRepository(ddbb)
+	dataRepo := repository.NewDataRepository(ddbb)
 
 	authService := service.NewAuthService(authRepo)
+	dataService := service.NewDataService(dataRepo)
 
 	authHandler := handlers.NewAuthHandler(authService)
+	dataHandler := handlers.NewDataHandler(dataService)
 
 	api := e.Group("/api/v1")
 	api.GET("/ping", handlers.Ping)
@@ -36,6 +40,11 @@ func SetupRouter(e *echo.Echo, cfg *config.Config, log *logger.Logger, db *db.Da
 	{
 		auth.POST("/sign-up", authHandler.SignUpUser)
 		auth.POST("/sign-in", authHandler.SignInUser)
+	}
+
+	data := api.Group("/data", rmiddleware.JWTMiddleware)
+	{
+		data.GET("/get-user", dataHandler.GetUser)
 	}
 
 }

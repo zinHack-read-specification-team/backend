@@ -15,6 +15,7 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
+// GenerateJWT создаёт и подписывает JWT токен для указанного пользователя.
 func GenerateJWT(userID uuid.UUID) (string, error) {
 	expirationTime := time.Now().Add(24 * time.Hour)
 	claims := &Claims{
@@ -23,9 +24,9 @@ func GenerateJWT(userID uuid.UUID) (string, error) {
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 		},
 	}
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	fmt.Println(token)
-	signedToken, err := token.SignedString([]byte(SecretKey))
+	signedToken, err := token.SignedString([]byte(SecretKey)) // ✅ используем []byte
 	if err != nil {
 		fmt.Println("Error signing token:", err)
 		return "", err
@@ -34,10 +35,11 @@ func GenerateJWT(userID uuid.UUID) (string, error) {
 	return signedToken, nil
 }
 
+// DecodeJWT парсит и валидирует токен, возвращает Claims если всё ок.
 func DecodeJWT(tokenStr string) (*Claims, error) {
 	claims := &Claims{}
 	token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
-		return SecretKey, nil
+		return []byte(SecretKey), nil // ✅ правильно: []byte, а не string
 	})
 	if err != nil {
 		return nil, err
@@ -50,6 +52,7 @@ func DecodeJWT(tokenStr string) (*Claims, error) {
 	return claims, nil
 }
 
+// InitJWTKey инициализирует секретный ключ для JWT.
 func InitJWTKey(key string) {
 	SecretKey = key
 	fmt.Println("✅ JWT key initialized successfully")
