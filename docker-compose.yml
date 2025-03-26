@@ -6,12 +6,9 @@ services:
     platform: linux/amd64
     container_name: zinhack_back
     depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      minio:
-        condition: service_healthy
+      - db
+      - redis
+      - minio
     environment:
       SERVER_ADDRESS: "0.0.0.0:8080"
       SERVER_ENV: "prod"
@@ -52,11 +49,6 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - zinhack_network
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "zinhack"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
 
   redis:
     image: redis:7
@@ -66,11 +58,6 @@ services:
       - "6613:6379"
     networks:
       - zinhack_network
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
 
   minio:
     image: minio/minio
@@ -87,11 +74,6 @@ services:
       - minio_data:/data
     networks:
       - zinhack_network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/ready"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
 
 volumes:
   postgres_data:
