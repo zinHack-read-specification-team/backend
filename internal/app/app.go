@@ -77,5 +77,5 @@ func (a *App) RunServer() error {
 	// Routes
 	router.SetupRouter(e, a.Config, a.Logger, a.DB, a.Cache, a.S3)
 
-	return e.Start(":" + a.Config.ServerAddress)
+	return e.Start(a.Config.ServerAddress)
 }
