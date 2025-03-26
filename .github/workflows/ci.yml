@@ -80,22 +80,26 @@ jobs:
     needs: test
 
     steps:
-      - name: Deploy via SSH
+      - name: Archive compose files
+        run: tar -czf deploy.tar.gz docker-compose.yml .env || echo "no .env - continue"
+
+      - name: Copy files and deploy
         run: |
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" scp -o StrictHostKeyChecking=no deploy.tar.gz ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~
+
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} <<EOF
             echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ secrets.GHCR_USERNAME }} --password-stdin
 
-            cd ~/zin_hack_backend || exit 1
+            rm -rf ./deploy_tmp
+            mkdir deploy_tmp && tar -xzf deploy.tar.gz -C deploy_tmp
+            cd deploy_tmp
 
-            echo "IMAGE_NAME=$IMAGE_NAME" > .env
-
-            docker compose pull
             docker compose down || true
+            docker compose pull
             docker compose up -d
 
             sleep 3
-            echo "--- Production Health Check ---"
-            curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/api/v1/ping
-            echo
-            echo "--- Backend Logs ---"
+            echo "--- Health Check ---"
+            curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/api/v1/ping || echo "000"
+            echo "--- Logs ---"
             docker compose logs app
