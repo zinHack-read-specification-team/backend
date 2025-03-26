@@ -80,26 +80,31 @@ jobs:
     needs: test
 
     steps:
-      - name: Archive compose files
+      - name: Archive latest compose
         run: tar -czf deploy.tar.gz docker-compose.yml .env || echo "no .env - continue"
 
-      - name: Copy files and deploy
+      - name: Copy compose to server
         run: |
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" scp -o StrictHostKeyChecking=no deploy.tar.gz ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:~
 
-          sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} <<EOF
+      - name: SSH Deploy
+        run: |
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
             echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ secrets.GHCR_USERNAME }} --password-stdin
 
-            rm -rf ./deploy_tmp
-            mkdir deploy_tmp && tar -xzf deploy.tar.gz -C deploy_tmp
-            cd deploy_tmp
+            rm -rf ~/zinhack_temp_deploy
+            mkdir ~/zinhack_temp_deploy
+            tar -xzf ~/deploy.tar.gz -C ~/zinhack_temp_deploy
 
-            docker compose down || true
-            docker compose pull
-            docker compose up -d
+            cd ~/zinhack_temp_deploy
 
-            sleep 3
-            echo "--- Health Check ---"
+            docker compose -f docker-compose.yml down || true
+            docker compose -f docker-compose.yml pull
+            docker compose -f docker-compose.yml up -d
+
+            echo "--- Sleep 5s and ping check ---"
+            sleep 5
             curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/api/v1/ping || echo "000"
+
             echo "--- Logs ---"
-            docker compose logs app
+            docker compose -f docker-compose.yml logs app || echo "⚠️ No logs for app"
