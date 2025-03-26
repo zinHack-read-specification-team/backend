@@ -3,6 +3,7 @@ version: "3.8"
 services:
   app:
     image: ${IMAGE_NAME}
+    platform: linux/amd64
     container_name: zinhack_back
     depends_on:
       db:
@@ -18,9 +19,9 @@ services:
         # PostgreSQL
         DB_HOST: db
         DB_PORT: "5432"
-        DB_USER: postgres
-        DB_PASS: yourpassword
-        DB_NAME: mydatabase
+        DB_USER: zinhack
+        DB_PASS: zinhack
+        DB_NAME: zinhack
 
         # Redis
         REDIS_HOST: redis
@@ -36,16 +37,16 @@ services:
       - "6611:8080"
     networks:
       - backend_network
-    restart: always
+    
 
   db:
-    image: postgres:15
+    image: postgres:16
     container_name: zinhack_postgres_db
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: yourpassword
-      POSTGRES_DB: mydatabase
+      POSTGRES_USER: zinhack
+      POSTGRES_PASSWORD: zinhack
+      POSTGRES_DB: zinhack
     ports:
       - "6612:5432"
     volumes:
@@ -53,10 +54,11 @@ services:
     networks:
       - backend_network
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
+      test: ["CMD", "pg_isready", "-U", "zinhack"]
       interval: 5s
-      timeout: 5s
-      retries: 10
+      timeout: 3s
+      retries: 5   
+
 
   redis:
     image: redis:7
