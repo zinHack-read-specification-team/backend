@@ -26,12 +26,15 @@ func SetupRouter(e *echo.Echo, cfg *config.Config, log *logger.Logger, db *db.Da
 
 	authRepo := repository.NewAuthRepository(ddbb)
 	dataRepo := repository.NewDataRepository(ddbb)
+	GameLinkRepo := repository.NewGameLinkRepository(ddbb)
 
 	authService := service.NewAuthService(authRepo)
 	dataService := service.NewDataService(dataRepo)
+	GgameLinkService := service.NewGameLinkService(GameLinkRepo)
 
 	authHandler := handlers.NewAuthHandler(authService)
 	dataHandler := handlers.NewDataHandler(dataService)
+	gameLinkHandler := handlers.NewGameLinkHandler(GgameLinkService)
 
 	api := e.Group("/api/v1")
 	api.GET("/ping", handlers.Ping)
@@ -45,6 +48,8 @@ func SetupRouter(e *echo.Echo, cfg *config.Config, log *logger.Logger, db *db.Da
 	data := api.Group("/data", rmiddleware.JWTMiddleware)
 	{
 		data.GET("/get-user", dataHandler.GetUser)
+		data.POST("/create-link", gameLinkHandler.CreateGameLink)
+		data.GET("/links", gameLinkHandler.GetUserLinks)
 	}
 
 }
