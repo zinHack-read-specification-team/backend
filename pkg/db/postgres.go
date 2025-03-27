@@ -31,6 +31,7 @@ func NewDatabase(cfg *config.Config) (*Database, error) {
 	if err := db.AutoMigrate(
 		&models.User{},
 		&models.GameLink{},
+		&models.GameUser{},
 	); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 		return nil, err

@@ -54,5 +54,16 @@ func SetupRouter(e *echo.Echo, cfg *config.Config, log *logger.Logger, db *db.Da
 	user := api.Group("/user")
 	{
 		user.GET("/check-link/:code", gameLinkHandler.CheckLink)
+
+	}
+
+	gameUserRepo := repository.NewGameUserRepository(ddbb)
+	gameUserService := service.NewGameUserService(gameUserRepo, GameLinkRepo)
+	gameUserHandler := handlers.NewGameUserHandler(gameUserService)
+
+	game := api.Group("/game")
+	{
+		game.POST("/register", gameUserHandler.RegisterPlayer)
+		game.PUT("/finish/:id", gameUserHandler.FinishGame) // <-- исправлено
 	}
 }
