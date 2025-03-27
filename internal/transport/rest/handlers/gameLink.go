@@ -61,3 +61,23 @@ func (h *GameLinkHandler) GetUserLinks(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, links)
 }
+
+// handlers/game_link_handler.go
+
+type CheckLinkReq struct {
+	Code string `json:"code" validate:"required,len=6"`
+}
+
+func (h *GameLinkHandler) CheckLink(c echo.Context) error {
+	code := c.Param("code")
+	if len(code) != 6 {
+		return c.JSON(utils.BadRequestError())
+	}
+
+	link, err := h.service.CheckLink(code)
+	if err != nil {
+		return c.JSON(utils.NotFoundError())
+	}
+
+	return c.JSON(http.StatusOK, link)
+}

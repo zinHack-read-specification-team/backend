@@ -54,3 +54,11 @@ func (r *GameLinkRepository) GetLinksByUserID(userID uuid.UUID) ([]models.GameLi
 	}
 	return links, nil
 }
+
+func (r *GameLinkRepository) GetLinkByCode(code string) (*models.GameLink, error) {
+	var link models.GameLink
+	if err := r.db.Where("code = ?", code).First(&link).Error; err != nil {
+		return nil, err
+	}
+	return &link, nil
+}

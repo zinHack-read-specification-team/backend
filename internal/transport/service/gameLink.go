@@ -32,3 +32,6 @@ func (s *GameLinkService) CreateLink(userID uuid.UUID, gameName, schoolNum, clas
 func (s *GameLinkService) GetLinksByUserID(userID uuid.UUID) ([]models.GameLink, error) {
 	return s.repo.GetLinksByUserID(userID)
 }
+func (s *GameLinkService) CheckLink(code string) (*models.GameLink, error) {
+	return s.repo.GetLinkByCode(code)
+}
