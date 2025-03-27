@@ -41,3 +41,19 @@ func (h *DataHandler) GetUser(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, user)
 }
+
+// internal/transport/rest/handlers/data.go
+
+func (h *DataHandler) GetGameStats(c echo.Context) error {
+	code := c.Param("code")
+	if code == "" {
+		return c.JSON(utils.BadRequestError())
+	}
+
+	users, err := h.data.GetGameStatsByCode(code)
+	if err != nil {
+		return c.JSON(utils.InternalServerError(err.Error()))
+	}
+
+	return c.JSON(http.StatusOK, users)
+}

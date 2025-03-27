@@ -50,6 +50,8 @@ func SetupRouter(e *echo.Echo, cfg *config.Config, log *logger.Logger, db *db.Da
 		data.GET("/get-user", dataHandler.GetUser)
 		data.POST("/create-link", gameLinkHandler.CreateGameLink)
 		data.GET("/links", gameLinkHandler.GetUserLinks)
+		data.GET("/stats/:code", dataHandler.GetGameStats)
+
 	}
 	user := api.Group("/user")
 	{

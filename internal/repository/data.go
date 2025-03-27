@@ -24,3 +24,13 @@ func (r *DataRepository) GetUser(id string) (*models.User, error) {
 	}
 	return &user, nil
 }
+
+// internal/repository/data.go
+
+func (r *DataRepository) GetGameUsersByCode(code string) ([]models.GameUser, error) {
+	var users []models.GameUser
+	if err := r.db.Where("game_code = ?", code).Find(&users).Error; err != nil {
+		return nil, err
+	}
+	return users, nil
+}
