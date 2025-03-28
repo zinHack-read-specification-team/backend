@@ -6,6 +6,8 @@ RUN apk update && apk add --no-cache \
 WORKDIR /app
 
 COPY go.mod go.sum ./
+# Копируем шрифт в контейнер
+COPY fonts/ /app/fonts/
 RUN go mod download && go mod verify && go mod tidy
 
 COPY . .
