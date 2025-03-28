@@ -1,3 +1,4 @@
+# Этап сборки приложения
 FROM golang:1.23-alpine AS builder
 
 RUN apk update && apk add --no-cache \
@@ -14,6 +15,7 @@ COPY . .
 
 RUN go build -o bin/application ./cmd/backend
 
+# Этап запуска приложения
 FROM alpine:3.21 AS runner
 
 RUN apk add --no-cache \
@@ -23,6 +25,7 @@ RUN apk add --no-cache \
 WORKDIR /app
 
 COPY --from=builder /app/bin/application ./
+COPY --from=builder /app/fonts /app/fonts  
 
 ENV APP_ENV=prod
 
