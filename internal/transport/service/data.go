@@ -42,7 +42,7 @@ func (s *DataService) GenerateCertificate(userID uuid.UUID) ([]byte, error) {
 	}
 
 	pdf := gofpdf.New("P", "mm", "A4", "")
-	pdf.AddUTF8Font("Arial", "", "/app/fonts/arial.ttf") // Путь к шрифту
+	pdf.AddUTF8Font("Arial", "", "/fonts/arial.ttf") // Путь к шрифту
 	pdf.SetFont("Arial", "", 14)
 	pdf.AddPage()
 
