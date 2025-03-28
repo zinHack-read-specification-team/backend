@@ -4,24 +4,24 @@ import (
 	"backend/internal/app"
 	"log"
 
-	_ "github.com/swaggo/echo-swagger"
+	_ "backend/docs" // подключение сгенерированных Swagger-документов
 )
 
-// @title           Go Echo Template API
+// @title           Безопасная школа API
 // @version         1.0
-// @description     Go echo template API swagger documentation
+// @description     Backend-сервис для работы с безопасной школьной платформой. Используйте спецификацию ниже для интеграции.
 
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+// @license.name   Apache 2.0
+// @license.url    http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host      localhost:8080
-// @BasePath  /api/v1
+// @host           zin-hack-25.antalkon.ru
+// @BasePath       /api/v1
 
 // @securityDefinitions.apikey BearerAuth
 // @in header
 // @name Authorization
 
-// @externalDocs.description  OpenAPI
+// @externalDocs.description  OpenAPI спецификация
 // @externalDocs.url          https://swagger.io/resources/open-api/
 func main() {
 	application, err := app.NewApp()

@@ -2,16 +2,20 @@ version: "3.8"
 
 services:
   app:
-    image: ${IMAGE_NAME}
-    platform: linux/amd64
-    container_name: zinhack_back
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: zinhack_app
     depends_on:
-      - db
-      - redis
-      - minio
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
     environment:
       SERVER_ADDRESS: "0.0.0.0:8080"
-      SERVER_ENV: "prod"
+      SERVER_ENV: "dev"
 
       # PostgreSQL
       DB_HOST: db
@@ -30,14 +34,22 @@ services:
       S3_SECRET_KEY: minioadmin
       S3_BUCKET: mybucket
       S3_USE_SSL: "false"
+
     ports:
       - "6611:8080"
+    volumes:
+      - .:/app # чтобы можно было видеть изменения без пересборки
     networks:
       - zinhack_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   db:
     image: postgres:16
-    container_name: zinhack_postgres_db
+    container_name: zinhack_db
     restart: always
     environment:
       POSTGRES_USER: zinhack
@@ -50,14 +62,14 @@ services:
     networks:
       - zinhack_network
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "zinhack"]
+      test: ["CMD-SHELL", "pg_isready -U zinhack"]
       interval: 5s
       timeout: 5s
       retries: 10
 
   redis:
     image: redis:7
-    container_name: zinhack_redis_cache
+    container_name: zinhack_redis
     restart: always
     ports:
       - "6613:6379"
@@ -71,7 +83,7 @@ services:
 
   minio:
     image: minio/minio
-    container_name: zin_hack_minio_storage
+    container_name: zinhack_minio
     restart: always
     command: server --console-address ":9001" /data
     environment:
