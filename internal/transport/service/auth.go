@@ -52,3 +52,5 @@ func (s *AuthService) SignInClient(u *models.User, c echo.Context) (string, erro
 	fmt.Println(token)
 	return token, nil
 }
+
+//sdf
