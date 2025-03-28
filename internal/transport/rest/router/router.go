@@ -67,5 +67,7 @@ func SetupRouter(e *echo.Echo, cfg *config.Config, log *logger.Logger, db *db.Da
 	{
 		game.POST("/register", gameUserHandler.RegisterPlayer)
 		game.PUT("/finish/:id", gameUserHandler.FinishGame) // <-- исправлено
+		game.GET("/certificate/:id", dataHandler.GenerateCertificate)
+
 	}
 }

@@ -3,6 +3,7 @@ package repository
 import (
 	"backend/internal/models"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -33,4 +34,20 @@ func (r *DataRepository) GetGameUsersByCode(code string) ([]models.GameUser, err
 		return nil, err
 	}
 	return users, nil
+}
+
+func (r *DataRepository) GetGameUserByID(id uuid.UUID) (*models.GameUser, error) {
+	var user models.GameUser
+	if err := r.db.First(&user, "id = ?", id).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (r *DataRepository) GetGameLinkByID(id uuid.UUID) (*models.GameLink, error) {
+	var game models.GameLink
+	if err := r.db.First(&game, "id = ?", id).Error; err != nil {
+		return nil, err
+	}
+	return &game, nil
 }

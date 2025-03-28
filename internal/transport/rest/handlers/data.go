@@ -57,3 +57,19 @@ func (h *DataHandler) GetGameStats(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, users)
 }
+
+func (h *DataHandler) GenerateCertificate(c echo.Context) error {
+	idStr := c.Param("id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		return c.JSON(utils.BadRequestError())
+	}
+
+	cert, err := h.data.GenerateCertificate(id)
+	if err != nil {
+		return c.JSON(utils.InternalServerError("Ошибка генерации PDF: " + err.Error()))
+	}
+
+	// Отдаем PDF файл
+	return c.Blob(http.StatusOK, "application/pdf", cert)
+}
